@@ -202,62 +202,62 @@ robyn_inputs <- function(dt_input = NULL,
     )
 
     ## Check date input (and set dayInterval and intervalType)
-    date_input <- check_datevar(dt_input, date_var)
-    dt_input <- date_input$dt_input # sorted date by ascending
-    date_var <- date_input$date_var # when date_var = "auto"
-    dayInterval <- date_input$dayInterval
-    intervalType <- date_input$intervalType
+    # date_input <- check_datevar(dt_input, date_var)
+    # dt_input <- date_input$dt_input # sorted date by ascending
+    # date_var <- date_input$date_var # when date_var = "auto"
+    # dayInterval <- date_input$dayInterval
+    # intervalType <- date_input$intervalType
 
     ## Check dependent var
     check_depvar(dt_input, dep_var, dep_var_type)
 
-    ## Check prophet
-    if (is.null(dt_holidays) || is.null(prophet_vars)) {
-      dt_holidays <- prophet_vars <- prophet_country <- prophet_signs <- NULL
-    }
-    prophet_signs <- check_prophet(dt_holidays, prophet_country, prophet_vars, prophet_signs, dayInterval)
+    # ## Check prophet
+    # if (is.null(dt_holidays) || is.null(prophet_vars)) {
+    #   dt_holidays <- prophet_vars <- prophet_country <- prophet_signs <- NULL
+    # }
+    # prophet_signs <- check_prophet(dt_holidays, prophet_country, prophet_vars, prophet_signs, dayInterval)
 
     ## Check baseline variables (and maybe transform context_signs)
-    context <- check_context(dt_input, context_vars, context_signs)
-    context_signs <- context$context_signs
+    # context <- check_context(dt_input, context_vars, context_signs)
+    # context_signs <- context$context_signs
 
-    ## Check paid media variables (set mediaVarCount and maybe transform paid_media_signs)
-    if (is.null(paid_media_vars)) paid_media_vars <- paid_media_spends
-    paidmedia <- check_paidmedia(dt_input, paid_media_vars, paid_media_signs, paid_media_spends)
-    paid_media_signs <- paidmedia$paid_media_signs
-    mediaVarCount <- paidmedia$mediaVarCount
-    exposure_vars <- paid_media_vars[!(paid_media_vars == paid_media_spends)]
+    # ## Check paid media variables (set mediaVarCount and maybe transform paid_media_signs)
+    # if (is.null(paid_media_vars)) paid_media_vars <- paid_media_spends
+    # paidmedia <- check_paidmedia(dt_input, paid_media_vars, paid_media_signs, paid_media_spends)
+    # paid_media_signs <- paidmedia$paid_media_signs
+    # mediaVarCount <- paidmedia$mediaVarCount
+    # exposure_vars <- paid_media_vars[!(paid_media_vars == paid_media_spends)]
 
-    ## Check organic media variables (and maybe transform organic_signs)
-    organic <- check_organicvars(dt_input, organic_vars, organic_signs)
-    organic_signs <- organic$organic_signs
+    # ## Check organic media variables (and maybe transform organic_signs)
+    # organic <- check_organicvars(dt_input, organic_vars, organic_signs)
+    # organic_signs <- organic$organic_signs
 
     ## Check factor_vars
     factor_vars <- check_factorvars(dt_input, factor_vars, context_vars, organic_vars)
 
-    ## Check all vars
-    all_media <- c(paid_media_spends, organic_vars)
-    all_ind_vars <- c(tolower(prophet_vars), context_vars, all_media)
-    check_allvars(all_ind_vars)
+    # ## Check all vars
+    # all_media <- c(paid_media_spends, organic_vars)
+    # all_ind_vars <- c(tolower(prophet_vars), context_vars, all_media)
+    # check_allvars(all_ind_vars)
 
     ## Check data dimension
     check_datadim(dt_input, all_ind_vars, rel = 10)
 
-    ## Check window_start & window_end (and transform parameters/data)
-    windows <- check_windows(dt_input, date_var, all_media, window_start, window_end)
+    # ## Check window_start & window_end (and transform parameters/data)
+    # windows <- check_windows(dt_input, date_var, all_media, window_start, window_end)
 
-    if (TRUE) {
-      dt_input <- windows$dt_input
-      window_start <- windows$window_start
-      rollingWindowStartWhich <- windows$rollingWindowStartWhich
-      refreshAddedStart <- windows$refreshAddedStart
-      window_end <- windows$window_end
-      rollingWindowEndWhich <- windows$rollingWindowEndWhich
-      rollingWindowLength <- windows$rollingWindowLength
-    }
+    # if (TRUE) {
+    #   dt_input <- windows$dt_input
+    #   window_start <- windows$window_start
+    #   rollingWindowStartWhich <- windows$rollingWindowStartWhich
+    #   refreshAddedStart <- windows$refreshAddedStart
+    #   window_end <- windows$window_end
+    #   rollingWindowEndWhich <- windows$rollingWindowEndWhich
+    #   rollingWindowLength <- windows$rollingWindowLength
+    # }
 
-    ## Check adstock
-    adstock <- check_adstock(adstock)
+    # ## Check adstock
+    # adstock <- check_adstock(adstock)
 
     ## Check calibration and iters/trials
     calibration_input <- check_calibration(
@@ -265,48 +265,48 @@ robyn_inputs <- function(dt_input = NULL,
       window_start, window_end, paid_media_spends, organic_vars
     )
 
-    ## Not used variables
-    unused_vars <- colnames(dt_input)[!colnames(dt_input) %in% c(
-      dep_var, date_var, context_vars, paid_media_vars, paid_media_spends, organic_vars
-    )]
+    # ## Not used variables
+    # unused_vars <- colnames(dt_input)[!colnames(dt_input) %in% c(
+    #   dep_var, date_var, context_vars, paid_media_vars, paid_media_spends, organic_vars
+    # )]
 
     # Check for no-variance columns (after removing not-used)
     check_novar(select(dt_input, -all_of(unused_vars)))
 
     ## Collect input
     InputCollect <- list(
-      dt_input = dt_input,
-      dt_holidays = dt_holidays,
-      dt_mod = NULL,
-      dt_modRollWind = NULL,
-      xDecompAggPrev = NULL,
-      date_var = date_var,
-      dayInterval = dayInterval,
-      intervalType = intervalType,
-      dep_var = dep_var,
-      dep_var_type = dep_var_type,
-      prophet_vars = tolower(prophet_vars),
-      prophet_signs = prophet_signs,
-      prophet_country = prophet_country,
-      context_vars = context_vars,
-      context_signs = context_signs,
-      paid_media_vars = paid_media_vars,
-      paid_media_signs = paid_media_signs,
-      paid_media_spends = paid_media_spends,
-      mediaVarCount = mediaVarCount,
-      exposure_vars = exposure_vars,
-      organic_vars = organic_vars,
-      organic_signs = organic_signs,
-      all_media = all_media,
-      all_ind_vars = all_ind_vars,
+      # dt_input = dt_input,
+      # dt_holidays = dt_holidays,
+      # dt_mod = NULL,
+      # dt_modRollWind = NULL,
+      # xDecompAggPrev = NULL,
+      # date_var = date_var,
+      # dayInterval = dayInterval,
+      # intervalType = intervalType,
+      # dep_var = dep_var,
+      # dep_var_type = dep_var_type,
+      # prophet_vars = tolower(prophet_vars),
+      # prophet_signs = prophet_signs,
+      # prophet_country = prophet_country,
+      # context_vars = context_vars,
+      # context_signs = context_signs,
+      # paid_media_vars = paid_media_vars,
+      # paid_media_signs = paid_media_signs,
+      # paid_media_spends = paid_media_spends,
+      # mediaVarCount = mediaVarCount,
+      # exposure_vars = exposure_vars,
+      # organic_vars = organic_vars,
+      # organic_signs = organic_signs,
+      # all_media = all_media,
+      # all_ind_vars = all_ind_vars,
       factor_vars = factor_vars,
-      unused_vars = unused_vars,
-      window_start = window_start,
-      rollingWindowStartWhich = rollingWindowStartWhich,
-      window_end = window_end,
-      rollingWindowEndWhich = rollingWindowEndWhich,
-      rollingWindowLength = rollingWindowLength,
-      refreshAddedStart = refreshAddedStart,
+      # unused_vars = unused_vars,
+      # window_start = window_start,
+      # rollingWindowStartWhich = rollingWindowStartWhich,
+      # window_end = window_end,
+      # rollingWindowEndWhich = rollingWindowEndWhich,
+      # rollingWindowLength = rollingWindowLength,
+      # refreshAddedStart = refreshAddedStart,
       adstock = adstock,
       hyperparameters = hyperparameters,
       calibration_input = calibration_input,
@@ -514,19 +514,19 @@ Adstock: {x$adstock}
 #' }
 #' @return Character vector. Names of hyper-parameters that should be defined.
 #' @export
-hyper_names <- function(adstock, all_media) {
-  adstock <- check_adstock(adstock)
-  if (adstock == "geometric") {
-    local_name <- sort(apply(expand.grid(all_media, HYPS_NAMES[
-      grepl("thetas|alphas|gammas", HYPS_NAMES)
-    ]), 1, paste, collapse = "_"))
-  } else if (adstock %in% c("weibull_cdf", "weibull_pdf")) {
-    local_name <- sort(apply(expand.grid(all_media, HYPS_NAMES[
-      grepl("shapes|scales|alphas|gammas", HYPS_NAMES)
-    ]), 1, paste, collapse = "_"))
-  }
-  return(local_name)
-}
+# hyper_names <- function(adstock, all_media) {
+#   adstock <- check_adstock(adstock)
+#   if (adstock == "geometric") {
+#     local_name <- sort(apply(expand.grid(all_media, HYPS_NAMES[
+#       grepl("thetas|alphas|gammas", HYPS_NAMES)
+#     ]), 1, paste, collapse = "_"))
+#   } else if (adstock %in% c("weibull_cdf", "weibull_pdf")) {
+#     local_name <- sort(apply(expand.grid(all_media, HYPS_NAMES[
+#       grepl("shapes|scales|alphas|gammas", HYPS_NAMES)
+#     ]), 1, paste, collapse = "_"))
+#   }
+#   return(local_name)
+# }
 
 
 ####################################################################
@@ -561,27 +561,27 @@ hyper_limits <- function() {
 #
 # @rdname robyn_inputs
 robyn_engineering <- function(x, quiet = FALSE, ...) {
-  if (!quiet) message(">> Running feature engineering...")
-  InputCollect <- x
-  check_InputCollect(InputCollect)
-  dt_input <- select(InputCollect$dt_input, -all_of(InputCollect$unused_vars))
-  paid_media_vars <- InputCollect$paid_media_vars
-  paid_media_spends <- InputCollect$paid_media_spends
-  factor_vars <- InputCollect$factor_vars
-  rollingWindowStartWhich <- InputCollect$rollingWindowStartWhich
-  rollingWindowEndWhich <- InputCollect$rollingWindowEndWhich
+  # if (!quiet) message(">> Running feature engineering...")
+  # InputCollect <- x
+  # check_InputCollect(InputCollect)
+  # dt_input <- select(InputCollect$dt_input, -all_of(InputCollect$unused_vars))
+  # paid_media_vars <- InputCollect$paid_media_vars
+  # paid_media_spends <- InputCollect$paid_media_spends
+  # factor_vars <- InputCollect$factor_vars
+  # rollingWindowStartWhich <- InputCollect$rollingWindowStartWhich
+  # rollingWindowEndWhich <- InputCollect$rollingWindowEndWhich
 
-  # dt_inputRollWind
-  dt_inputRollWind <- dt_input[rollingWindowStartWhich:rollingWindowEndWhich, ]
+  # # dt_inputRollWind
+  # dt_inputRollWind <- dt_input[rollingWindowStartWhich:rollingWindowEndWhich, ]
 
-  # dt_transform
-  dt_transform <- dt_input
-  colnames(dt_transform)[colnames(dt_transform) == InputCollect$date_var] <- "ds"
-  colnames(dt_transform)[colnames(dt_transform) == InputCollect$dep_var] <- "dep_var"
-  dt_transform <- arrange(dt_transform, .data$ds)
+  # # dt_transform
+  # dt_transform <- dt_input
+  # colnames(dt_transform)[colnames(dt_transform) == InputCollect$date_var] <- "ds"
+  # colnames(dt_transform)[colnames(dt_transform) == InputCollect$dep_var] <- "dep_var"
+  # dt_transform <- arrange(dt_transform, .data$ds)
 
-  # dt_transformRollWind
-  dt_transformRollWind <- dt_transform[rollingWindowStartWhich:rollingWindowEndWhich, ]
+  # # dt_transformRollWind
+  # dt_transformRollWind <- dt_transform[rollingWindowStartWhich:rollingWindowEndWhich, ]
 
   ################################################################
   #### Model exposure metric from spend
@@ -686,18 +686,18 @@ robyn_engineering <- function(x, quiet = FALSE, ...) {
     }
   }
 
-  ################################################################
-  #### Clean & aggregate data
+  # ################################################################
+  # #### Clean & aggregate data
 
-  ## Transform all factor variables
-  if (length(factor_vars) > 0) {
-    dt_transform <- mutate_at(dt_transform, factor_vars, as.factor)
-  }
+  # ## Transform all factor variables
+  # if (length(factor_vars) > 0) {
+  #   dt_transform <- mutate_at(dt_transform, factor_vars, as.factor)
+  # }
 
-  ################################################################
-  #### Obtain prophet trend, seasonality and change-points
+  # ################################################################
+  # #### Obtain prophet trend, seasonality and change-points
 
-  if (!is.null(InputCollect$prophet_vars) && length(InputCollect$prophet_vars) > 0) {
+  # if (!is.null(InputCollect$prophet_vars) && length(InputCollect$prophet_vars) > 0) {
     if (length(InputCollect[["custom_params"]]) > 0) {
       custom_params <- InputCollect[["custom_params"]]
     } else {
@@ -717,28 +717,28 @@ robyn_engineering <- function(x, quiet = FALSE, ...) {
     #   message(paste("Using custom prophet parameters:", paste(prophet_custom_args, collapse = ", ")))
     # }
 
-    dt_transform <- prophet_decomp(
-      dt_transform,
-      dt_holidays = InputCollect$dt_holidays,
-      prophet_country = InputCollect$prophet_country,
-      prophet_vars = InputCollect$prophet_vars,
-      prophet_signs = InputCollect$prophet_signs,
-      factor_vars = factor_vars,
-      context_vars = InputCollect$context_vars,
-      paid_media_spends = paid_media_spends,
-      intervalType = InputCollect$intervalType,
-      dayInterval = InputCollect$dayInterval,
-      custom_params = custom_params
-    )
+    # dt_transform <- prophet_decomp(
+    #   dt_transform,
+    #   dt_holidays = InputCollect$dt_holidays,
+    #   prophet_country = InputCollect$prophet_country,
+    #   prophet_vars = InputCollect$prophet_vars,
+    #   prophet_signs = InputCollect$prophet_signs,
+    #   factor_vars = factor_vars,
+    #   context_vars = InputCollect$context_vars,
+    #   paid_media_spends = paid_media_spends,
+    #   intervalType = InputCollect$intervalType,
+    #   dayInterval = InputCollect$dayInterval,
+    #   custom_params = custom_params
+    # )
   }
 
-  ################################################################
-  #### Finalize enriched input
+  # ################################################################
+  # #### Finalize enriched input
 
-  dt_transform <- subset(dt_transform, select = c("ds", "dep_var", InputCollect$all_ind_vars))
-  InputCollect[["dt_mod"]] <- dt_transform
-  InputCollect[["dt_modRollWind"]] <- dt_transform[rollingWindowStartWhich:rollingWindowEndWhich, ]
-  InputCollect[["dt_inputRollWind"]] <- dt_inputRollWind
+  # dt_transform <- subset(dt_transform, select = c("ds", "dep_var", InputCollect$all_ind_vars))
+  # InputCollect[["dt_mod"]] <- dt_transform
+  # InputCollect[["dt_modRollWind"]] <- dt_transform[rollingWindowStartWhich:rollingWindowEndWhich, ]
+  # InputCollect[["dt_inputRollWind"]] <- dt_inputRollWind
   InputCollect[["modNLS"]] <- list(
     results = modNLSCollect,
     yhat = yhatNLSCollect,
@@ -768,17 +768,17 @@ prophet_decomp <- function(dt_transform, dt_holidays,
                            factor_vars, context_vars, paid_media_spends,
                            intervalType, dayInterval, custom_params) {
   check_prophet(dt_holidays, prophet_country, prophet_vars, prophet_signs, dayInterval)
-  recurrence <- select(dt_transform, .data$ds, .data$dep_var) %>% rename("y" = "dep_var")
-  holidays <- set_holidays(dt_transform, dt_holidays, intervalType)
-  use_trend <- "trend" %in% prophet_vars
-  use_holiday <- "holiday" %in% prophet_vars
-  use_season <- "season" %in% prophet_vars | "yearly.seasonality" %in% prophet_vars
-  use_monthly <- "monthly" %in% prophet_vars
-  use_weekday <- "weekday" %in% prophet_vars | "weekly.seasonality" %in% prophet_vars
+  # recurrence <- select(dt_transform, .data$ds, .data$dep_var) %>% rename("y" = "dep_var")
+  # holidays <- set_holidays(dt_transform, dt_holidays, intervalType)
+  # use_trend <- "trend" %in% prophet_vars
+  # use_holiday <- "holiday" %in% prophet_vars
+  # use_season <- "season" %in% prophet_vars | "yearly.seasonality" %in% prophet_vars
+  # use_monthly <- "monthly" %in% prophet_vars
+  # use_weekday <- "weekday" %in% prophet_vars | "weekly.seasonality" %in% prophet_vars
 
-  dt_regressors <- bind_cols(recurrence, select(
-    dt_transform, all_of(c(context_vars, paid_media_spends))
-  )) %>%
+  # dt_regressors <- bind_cols(recurrence, select(
+  #   dt_transform, all_of(c(context_vars, paid_media_spends))
+  # )) %>%
     mutate(ds = as.Date(.data$ds))
 
   prophet_params <- list(
@@ -791,17 +791,17 @@ prophet_decomp <- function(dt_transform, dt_holidays,
       custom_params[["weekly.seasonality"]],
       use_weekday
     ),
-    daily.seasonality = FALSE # No hourly models allowed
+    # daily.seasonality = FALSE # No hourly models allowed
   )
   custom_params$yearly.seasonality <- custom_params$weekly.seasonality <- NULL
-  prophet_params <- append(prophet_params, custom_params)
-  modelRecurrence <- do.call(prophet, as.list(prophet_params))
-  if (use_monthly) {
-    modelRecurrence <- add_seasonality(
-      modelRecurrence,
-      name = "monthly", period = 30.5, fourier.order = 5
-    )
-  }
+  # prophet_params <- append(prophet_params, custom_params)
+  # modelRecurrence <- do.call(prophet, as.list(prophet_params))
+  # if (use_monthly) {
+  #   modelRecurrence <- add_seasonality(
+  #     modelRecurrence,
+  #     name = "monthly", period = 30.5, fourier.order = 5
+  #   )
+  # }
 
   # dt_regressors <<- dt_regressors
   # modelRecurrence <<- modelRecurrence
@@ -811,36 +811,36 @@ prophet_decomp <- function(dt_transform, dt_holidays,
       select(all_of(factor_vars)) %>%
       ohse(drop = FALSE) %>%
       select(-any_of(factor_vars))
-    ohe_names <- names(dt_ohe)
-    for (addreg in ohe_names) modelRecurrence <- add_regressor(modelRecurrence, addreg)
-    dt_ohe <- select(dt_regressors, -all_of(factor_vars)) %>% bind_cols(dt_ohe)
-    mod_ohe <- fit.prophet(modelRecurrence, dt_ohe)
-    dt_forecastRegressor <- predict(mod_ohe, dt_ohe)
-    forecastRecurrence <- select(dt_forecastRegressor, -contains("_lower"), -contains("_upper"))
-    for (aggreg in factor_vars) {
-      oheRegNames <- grep(paste0("^", aggreg, ".*"), names(forecastRecurrence), value = TRUE)
-      get_reg <- rowSums(select(forecastRecurrence, all_of(oheRegNames)))
-      dt_transform[, aggreg] <- scale(get_reg, center = min(get_reg), scale = FALSE)
-    }
-  } else {
-    if (dayInterval == 1) {
-      warning(
-        "Currently, there's a known issue with prophet that may crash this use case.",
-        "\n Read more here: https://github.com/facebookexperimental/Robyn/issues/472"
-      )
-    }
-    mod <- fit.prophet(modelRecurrence, dt_regressors)
-    forecastRecurrence <- predict(mod, dt_regressors) # prophet::prophet_plot_components(modelRecurrence, forecastRecurrence)
-  }
+    # ohe_names <- names(dt_ohe)
+    # for (addreg in ohe_names) modelRecurrence <- add_regressor(modelRecurrence, addreg)
+    # dt_ohe <- select(dt_regressors, -all_of(factor_vars)) %>% bind_cols(dt_ohe)
+    # mod_ohe <- fit.prophet(modelRecurrence, dt_ohe)
+    # dt_forecastRegressor <- predict(mod_ohe, dt_ohe)
+    # forecastRecurrence <- select(dt_forecastRegressor, -contains("_lower"), -contains("_upper"))
+    # for (aggreg in factor_vars) {
+    #   oheRegNames <- grep(paste0("^", aggreg, ".*"), names(forecastRecurrence), value = TRUE)
+    #   get_reg <- rowSums(select(forecastRecurrence, all_of(oheRegNames)))
+    #   dt_transform[, aggreg] <- scale(get_reg, center = min(get_reg), scale = FALSE)
+    # }
+  # } else {
+  #   if (dayInterval == 1) {
+  #     warning(
+  #       "Currently, there's a known issue with prophet that may crash this use case.",
+  #       "\n Read more here: https://github.com/facebookexperimental/Robyn/issues/472"
+  #     )
+  #   }
+  #   mod <- fit.prophet(modelRecurrence, dt_regressors)
+  #   forecastRecurrence <- predict(mod, dt_regressors) # prophet::prophet_plot_components(modelRecurrence, forecastRecurrence)
+  # }
 
-  these <- seq_along(unlist(recurrence[, 1]))
-  if (use_trend) dt_transform$trend <- forecastRecurrence$trend[these]
-  if (use_season) dt_transform$season <- forecastRecurrence$yearly[these]
-  if (use_monthly) dt_transform$monthly <- forecastRecurrence$monthly[these]
-  if (use_weekday) dt_transform$weekday <- forecastRecurrence$weekly[these]
-  if (use_holiday) dt_transform$holiday <- forecastRecurrence$holidays[these]
-  return(dt_transform)
-}
+#   these <- seq_along(unlist(recurrence[, 1]))
+#   if (use_trend) dt_transform$trend <- forecastRecurrence$trend[these]
+#   if (use_season) dt_transform$season <- forecastRecurrence$yearly[these]
+#   if (use_monthly) dt_transform$monthly <- forecastRecurrence$monthly[these]
+#   if (use_weekday) dt_transform$weekday <- forecastRecurrence$weekly[these]
+#   if (use_holiday) dt_transform$holiday <- forecastRecurrence$holidays[these]
+#   return(dt_transform)
+# }
 
 ####################################################################
 #' Fit a nonlinear model for media spend and exposure
@@ -942,37 +942,37 @@ fit_spend_exposure <- function(dt_spendModInput, mediaCostFactor, paid_media_var
 #' @param intervalType A character. Accepts one of the values:
 #' \code{c("day","week","month")}
 #' @return List. Containing the all spend-exposure model results.
-set_holidays <- function(dt_transform, dt_holidays, intervalType) {
-  opts <- c("day", "week", "month")
-  if (!intervalType %in% opts) {
-    stop("Pass a valid 'intervalType'. Any of: ", paste(opts, collapse = ", "))
-  }
+# set_holidays <- function(dt_transform, dt_holidays, intervalType) {
+#   opts <- c("day", "week", "month")
+#   if (!intervalType %in% opts) {
+#     stop("Pass a valid 'intervalType'. Any of: ", paste(opts, collapse = ", "))
+#   }
 
-  if (intervalType == "day") {
-    holidays <- dt_holidays
-  }
+#   if (intervalType == "day") {
+#     holidays <- dt_holidays
+#   }
 
-  if (intervalType == "week") {
-    weekStartInput <- lubridate::wday(dt_transform$ds[1], week_start = 1)
-    if (!weekStartInput %in% c(1, 7)) stop("Week start has to be Monday or Sunday")
-    holidays <- dt_holidays %>%
-      mutate(ds = floor_date(as.Date(.data$ds, origin = "1970-01-01"), unit = "week", week_start = weekStartInput)) %>%
-      select(.data$ds, .data$holiday, .data$country, .data$year) %>%
-      group_by(.data$ds, .data$country, .data$year) %>%
-      summarise(holiday = paste(.data$holiday, collapse = ", "), n = n())
-  }
+#   if (intervalType == "week") {
+#     weekStartInput <- lubridate::wday(dt_transform$ds[1], week_start = 1)
+#     if (!weekStartInput %in% c(1, 7)) stop("Week start has to be Monday or Sunday")
+#     holidays <- dt_holidays %>%
+#       mutate(ds = floor_date(as.Date(.data$ds, origin = "1970-01-01"), unit = "week", week_start = weekStartInput)) %>%
+#       select(.data$ds, .data$holiday, .data$country, .data$year) %>%
+#       group_by(.data$ds, .data$country, .data$year) %>%
+#       summarise(holiday = paste(.data$holiday, collapse = ", "), n = n())
+#   }
 
-  if (intervalType == "month") {
-    if (!all(day(dt_transform$ds) == 1)) {
-      stop("Monthly data should have first day of month as datestampe, e.g.'2020-01-01'")
-    }
-    holidays <- dt_holidays %>%
-      # mutate(ds = cut(.data$ds, intervalType)) %>%
-      mutate(ds = cut(.data$ds, intervalType)) %>%
-      select(.data$ds, .data$holiday, .data$country, .data$year) %>%
-      group_by(.data$ds, .data$country, .data$year) %>%
-      summarise(holiday = paste(.data$holiday, collapse = ", "), n = n())
-  }
+#   if (intervalType == "month") {
+#     if (!all(day(dt_transform$ds) == 1)) {
+#       stop("Monthly data should have first day of month as datestampe, e.g.'2020-01-01'")
+#     }
+#     holidays <- dt_holidays %>%
+#       # mutate(ds = cut(.data$ds, intervalType)) %>%
+#       mutate(ds = cut(.data$ds, intervalType)) %>%
+#       select(.data$ds, .data$holiday, .data$country, .data$year) %>%
+#       group_by(.data$ds, .data$country, .data$year) %>%
+#       summarise(holiday = paste(.data$holiday, collapse = ", "), n = n())
+#   }
 
-  return(holidays)
-}
+#   return(holidays)
+# }
